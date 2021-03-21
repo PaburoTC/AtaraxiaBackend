@@ -1,6 +1,6 @@
 import json
 
-from authentication.cipher import AESInstance, SHA512
+from Authentication.cipher import AESInstance, SHA512
 from django.test import Client, TestCase
 from .models import User
 
