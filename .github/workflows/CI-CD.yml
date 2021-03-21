@@ -1,0 +1,43 @@
+name: CI/CD
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  CI:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Django unit tests
+      run: |
+        pip3 install -r requirements.txt
+        python3 manage.py makemigrations
+        python3 manage.py migrate
+        python3 manage.py test
+  CD:
+    needs: CI
+    name: Continuous Delivery
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into production server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.SERVER_IP}}
+          username: ${{secrets.SERVER_USER}}
+          key: ${{secrets.SERVER_SSH_SK}}
+          port: ${{secrets.SERVER_PORT}}
+          script: |
+            cd AtaraxiaBackend
+            git pull origin master
+            git status
+            python3.9 -m pip install -r requirements.txt
+
+
+            
+          
+          
